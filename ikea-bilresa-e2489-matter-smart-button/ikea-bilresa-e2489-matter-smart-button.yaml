@@ -75,7 +75,14 @@ blueprint:
       selector:
         action: {}
 
-    button1_long:
+    button1_long_press:
+      name: Button 1 – Long Press (on press)
+      description: Action for Button 1 long press completion (long_press).
+      default: []
+      selector:
+        action: {}
+
+    button1_long_release:
       name: Button 1 – Long Press (on release)
       description: Action for Button 1 long press completion (long_release).
       default: []
@@ -100,7 +107,14 @@ blueprint:
       selector:
         action: {}
 
-    button2_long:
+    button2_long_press:
+      name: Button 2 – Long Press (on press)
+      description: Action for Button 2 long press completion (long_press).
+      default: []
+      selector:
+        action: {}
+
+    button2_long_release:
       name: Button 2 – Long Press (on release)
       description: Action for Button 2 long press completion (long_release).
       default: []
@@ -119,13 +133,13 @@ trigger:
   - platform: state
     id: button1
     entity_id: !input button1_event
-    not_from: 'unavailable'
-    not_to: 'unavailable'
+    not_from: "unavailable"
+    not_to: "unavailable"
   - platform: state
     id: button2
     entity_id: !input button2_event
-    not_from: 'unavailable'
-    not_to: 'unavailable'
+    not_from: "unavailable"
+    not_to: "unavailable"
   # Added not_from/not_to filters to prevent re-triggering on HA/Matter restarts; event entities use timestamp states
 
 condition: []
@@ -136,7 +150,6 @@ action:
       trigger_id: "{{ trigger.id }}"
 
   - choose:
-
       # -------------------------------------------------------------
       # BUTTON 1
       # -------------------------------------------------------------
@@ -156,8 +169,14 @@ action:
       - conditions:
           - condition: template
             value_template: >
+              {{ trigger_id == 'button1' and press_type == 'long_press' }}
+        sequence: !input button1_long_press
+
+      - conditions:
+          - condition: template
+            value_template: >
               {{ trigger_id == 'button1' and press_type == 'long_release' }}
-        sequence: !input button1_long
+        sequence: !input button1_long_release
 
       # -------------------------------------------------------------
       # BUTTON 2
@@ -178,7 +197,14 @@ action:
       - conditions:
           - condition: template
             value_template: >
+              {{ trigger_id == 'button2' and press_type == 'long_press' }}
+        sequence: !input button2_long_press
+
+      - conditions:
+          - condition: template
+            value_template: >
               {{ trigger_id == 'button2' and press_type == 'long_release' }}
-        sequence: !input button2_long
+        sequence: !input button2_long_release
 
 mode: restart
+
