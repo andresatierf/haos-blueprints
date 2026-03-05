@@ -1,0 +1,160 @@
+blueprint:
+  name: Core Daily Routine (Sun & Fixed Time Events)
+  description: >-
+    Provides triggers for standard sun events (dawn, sunrise, solar noon, sunset, dusk)
+    and fixed times (noon, midnight). Users define custom actions for each event.
+    Requires 'sun' integration enabled.
+  domain: automation
+  input:
+    # Dawn Event
+    dawn_offset:
+      name: Dawn Offset
+      description: Offset from dawn.
+      default: "00:00:00"
+      selector:
+        text:
+
+    # Sunrise Event
+    sunrise_offset:
+      name: Sunrise Offset
+      description: Offset from sunrise.
+      default: "00:00:00"
+      selector:
+        text:
+
+    # Solar Noon Event
+    solar_noon_offset:
+      name: Solar Noon Offset
+      description: Offset from solar noon. (True sun-highest point).
+      default: "00:00:00"
+      selector:
+        text:
+
+    # Sunset Event
+    sunset_offset:
+      name: Sunset Offset
+      description: Offset from sunset.
+      default: "00:00:00"
+      selector:
+        text:
+
+    # Dusk Event
+    dusk_offset:
+      name: Dusk Offset
+      description: Offset from dusk.
+      default: "00:00:00"
+      selector:
+        text:
+
+    # Fixed Time Events
+    fixed_noon_time:
+      name: Fixed Noon Time
+      description: Exact time for a mid-day trigger (e.g., 12:00:00).
+      default: "12:00:00"
+      selector:
+        time:
+    fixed_midnight_time:
+      name: Fixed Midnight Time
+      description: Exact time for a midnight trigger (e.g., 00:00:00).
+      default: "00:00:00"
+      selector:
+        time:
+
+    # Action Slots
+    dawn_actions:
+      name: Actions at Dawn
+      description: Add actions to perform at dawn.
+      selector:
+        action: {}
+    sunrise_actions:
+      name: Actions at Sunrise
+      description: Add actions to perform at sunrise.
+      selector:
+        action: {}
+    solar_noon_actions:
+      name: Actions at Solar Noon
+      description: Add actions to perform at solar noon.
+      selector:
+        action: {}
+    sunset_actions:
+      name: Actions at Sunset
+
+      description: Add actions to perform at sunset.
+      selector:
+        action: {}
+    dusk_actions:
+      name: Actions at Dusk
+      description: Add actions to perform at dusk.
+      selector:
+        action: {}
+    fixed_noon_actions:
+      name: Actions at Fixed Noon Time
+      description: Add actions to perform at the specified fixed noon time.
+      selector:
+        action: {}
+    fixed_midnight_actions:
+      name: Actions at Fixed Midnight Time
+      description: Add actions to perform at the specified fixed midnight time.
+      selector:
+        action: {}
+
+trigger:
+  - platform: sun
+    event: dawn
+    offset: !input dawn_offset
+    id: "dawn"
+  - platform: sun
+    event: sunrise
+    offset: !input sunrise_offset
+    id: "sunrise"
+  - platform: sun
+    event: solar_noon
+    offset: !input solar_noon_offset
+    id: "solar_noon"
+  - platform: sun
+    event: sunset
+    offset: !input sunset_offset
+    id: "sunset"
+  - platform: sun
+    event: dusk
+    offset: !input dusk_offset
+    id: "dusk"
+  - platform: time
+    at: !input fixed_noon_time
+    id: "fixed_noon"
+  - platform: time
+    at: !input fixed_midnight_time
+    id: "fixed_midnight"
+
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: "dawn"
+        sequence: !input dawn_actions
+      - conditions:
+          - condition: trigger
+            id: "sunrise"
+        sequence: !input sunrise_actions
+      - conditions:
+          - condition: trigger
+            id: "solar_noon"
+        sequence: !input solar_noon_actions
+      - conditions:
+          - condition: trigger
+            id: "sunset"
+        sequence: !input sunset_actions
+      - conditions:
+          - condition: trigger
+            id: "dusk"
+        sequence: !input dusk_actions
+      - conditions:
+          - condition: trigger
+            id: "fixed_noon"
+        sequence: !input fixed_noon_actions
+      - conditions:
+          - condition: trigger
+            id: "fixed_midnight"
+        sequence: !input fixed_midnight_actions
+    default: []
+mode: parallel
