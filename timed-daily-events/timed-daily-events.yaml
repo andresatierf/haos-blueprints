@@ -1,0 +1,253 @@
+blueprint:
+  name: Timed Daily Events
+  description: >-
+    Trigger actions at sun events (dawn, sunrise, solar noon, sunset, dusk) and
+    up to 6 configurable fixed times throughout the day.
+    All slots and their actions are optional. Requires the 'sun' integration for sun slots.
+  domain: automation
+  source_url: https://github.com/censay/haos-blueprints
+  homeassistant:
+    min_version: 2025.12.1
+  input:
+    sun_events:
+      name: Sun Events
+      description: Actions triggered by sun position. Requires the 'sun' integration.
+      collapsed: true
+      input:
+        dawn_offset:
+          name: "Dawn: Offset"
+          description: Offset from dawn (e.g. 00:15:00 or -00:15:00). Leave blank to disable.
+          default:
+          selector:
+            text:
+        dawn_actions:
+          name: "Dawn: Actions"
+          description: Actions to perform at dawn.
+          default: []
+          selector:
+            action: {}
+
+        sunrise_offset:
+          name: "Sunrise: Offset"
+          description: Offset from sunrise. Leave blank to disable.
+          default:
+          selector:
+            text:
+        sunrise_actions:
+          name: "Sunrise: Actions"
+          description: Actions to perform at sunrise.
+          default: []
+          selector:
+            action: {}
+
+        solar_noon_offset:
+          name: "Solar Noon: Offset"
+          description: Offset from solar noon (true sun-highest point). Leave blank to disable.
+          default:
+          selector:
+            text:
+        solar_noon_actions:
+          name: "Solar Noon: Actions"
+          description: Actions to perform at solar noon.
+          default: []
+          selector:
+            action: {}
+
+        sunset_offset:
+          name: "Sunset: Offset"
+          description: Offset from sunset. Leave blank to disable.
+          default:
+          selector:
+            text:
+        sunset_actions:
+          name: "Sunset: Actions"
+          description: Actions to perform at sunset.
+          default: []
+          selector:
+            action: {}
+
+        dusk_offset:
+          name: "Dusk: Offset"
+          description: Offset from dusk. Leave blank to disable.
+          default:
+          selector:
+            text:
+        dusk_actions:
+          name: "Dusk: Actions"
+          description: Actions to perform at dusk.
+          default: []
+          selector:
+            action: {}
+
+    fixed_time_slots:
+      name: Fixed Time Slots
+      description: Actions triggered at specific times of day.
+      collapsed: true
+      input:
+        slot_1_time:
+          name: "Slot 1: Time"
+          description: Time for the first fixed daily trigger.
+          default:
+          selector:
+            time:
+        slot_1_actions:
+          name: "Slot 1: Actions"
+          description: Actions to perform at Slot 1 time.
+          default: []
+          selector:
+            action: {}
+
+        slot_2_time:
+          name: "Slot 2: Time"
+          description: Time for the second fixed daily trigger.
+          default:
+          selector:
+            time:
+        slot_2_actions:
+          name: "Slot 2: Actions"
+          description: Actions to perform at Slot 2 time.
+          default: []
+          selector:
+            action: {}
+
+        slot_3_time:
+          name: "Slot 3: Time"
+          description: Time for the third fixed daily trigger.
+          default:
+          selector:
+            time:
+        slot_3_actions:
+          name: "Slot 3: Actions"
+          description: Actions to perform at Slot 3 time.
+          default: []
+          selector:
+            action: {}
+
+        slot_4_time:
+          name: "Slot 4: Time"
+          description: Time for the fourth fixed daily trigger.
+          default:
+          selector:
+            time:
+        slot_4_actions:
+          name: "Slot 4: Actions"
+          description: Actions to perform at Slot 4 time.
+          default: []
+          selector:
+            action: {}
+
+        slot_5_time:
+          name: "Slot 5: Time"
+          description: Time for the fifth fixed daily trigger.
+          default:
+          selector:
+            time:
+        slot_5_actions:
+          name: "Slot 5: Actions"
+          description: Actions to perform at Slot 5 time.
+          default: []
+          selector:
+            action: {}
+
+        slot_6_time:
+          name: "Slot 6: Time"
+          description: Time for the sixth fixed daily trigger.
+          default:
+          selector:
+            time:
+        slot_6_actions:
+          name: "Slot 6: Actions"
+          description: Actions to perform at Slot 6 time.
+          default: []
+          selector:
+            action: {}
+
+trigger:
+  - platform: sun
+    event: dawn
+    offset: !input dawn_offset
+    id: dawn
+  - platform: sun
+    event: sunrise
+    offset: !input sunrise_offset
+    id: sunrise
+  - platform: sun
+    event: solar_noon
+    offset: !input solar_noon_offset
+    id: solar_noon
+  - platform: sun
+    event: sunset
+    offset: !input sunset_offset
+    id: sunset
+  - platform: sun
+    event: dusk
+    offset: !input dusk_offset
+    id: dusk
+  - platform: time
+    at: !input slot_1_time
+    id: slot_1
+  - platform: time
+    at: !input slot_2_time
+    id: slot_2
+  - platform: time
+    at: !input slot_3_time
+    id: slot_3
+  - platform: time
+    at: !input slot_4_time
+    id: slot_4
+  - platform: time
+    at: !input slot_5_time
+    id: slot_5
+  - platform: time
+    at: !input slot_6_time
+    id: slot_6
+
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: dawn
+        sequence: !input dawn_actions
+      - conditions:
+          - condition: trigger
+            id: sunrise
+        sequence: !input sunrise_actions
+      - conditions:
+          - condition: trigger
+            id: solar_noon
+        sequence: !input solar_noon_actions
+      - conditions:
+          - condition: trigger
+            id: sunset
+        sequence: !input sunset_actions
+      - conditions:
+          - condition: trigger
+            id: dusk
+        sequence: !input dusk_actions
+      - conditions:
+          - condition: trigger
+            id: slot_1
+        sequence: !input slot_1_actions
+      - conditions:
+          - condition: trigger
+            id: slot_2
+        sequence: !input slot_2_actions
+      - conditions:
+          - condition: trigger
+            id: slot_3
+        sequence: !input slot_3_actions
+      - conditions:
+          - condition: trigger
+            id: slot_4
+        sequence: !input slot_4_actions
+      - conditions:
+          - condition: trigger
+            id: slot_5
+        sequence: !input slot_5_actions
+      - conditions:
+          - condition: trigger
+            id: slot_6
+        sequence: !input slot_6_actions
+    default: []
+
+mode: parallel
