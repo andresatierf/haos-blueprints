@@ -9,19 +9,19 @@ blueprint:
   homeassistant:
     min_version: 2025.12.1
   input:
-    sun_events:
-      name: Sun Events
-      description: Actions triggered by sun position. Requires the 'sun' integration.
+    dawn:
+      name: Dawn
+      description: Triggered at dawn. Requires the 'sun' integration. Leave offset blank to disable.
       collapsed: true
       input:
         dawn_offset:
-          name: "Dawn: Offset"
+          name: Offset
           description: Offset from dawn (e.g. 00:15:00 or -00:15:00). Leave blank to disable.
           default:
           selector:
             text:
         dawn_weekdays:
-          name: "Dawn: Active Days"
+          name: Active Days
           description: Days of the week on which the dawn actions run.
           default: [mon, tue, wed, thu, fri, sat, sun]
           selector:
@@ -36,20 +36,25 @@ blueprint:
                 - { label: Saturday, value: sat }
                 - { label: Sunday, value: sun }
         dawn_actions:
-          name: "Dawn: Actions"
+          name: Actions
           description: Actions to perform at dawn.
           default: []
           selector:
             action: {}
 
+    sunrise:
+      name: Sunrise
+      description: Triggered at sunrise. Requires the 'sun' integration. Leave offset blank to disable.
+      collapsed: true
+      input:
         sunrise_offset:
-          name: "Sunrise: Offset"
+          name: Offset
           description: Offset from sunrise. Leave blank to disable.
           default:
           selector:
             text:
         sunrise_weekdays:
-          name: "Sunrise: Active Days"
+          name: Active Days
           description: Days of the week on which the sunrise actions run.
           default: [mon, tue, wed, thu, fri, sat, sun]
           selector:
@@ -64,20 +69,25 @@ blueprint:
                 - { label: Saturday, value: sat }
                 - { label: Sunday, value: sun }
         sunrise_actions:
-          name: "Sunrise: Actions"
+          name: Actions
           description: Actions to perform at sunrise.
           default: []
           selector:
             action: {}
 
+    solar_noon:
+      name: Solar Noon
+      description: Triggered at solar noon (true sun-highest point). Requires the 'sun' integration. Leave offset blank to disable.
+      collapsed: true
+      input:
         solar_noon_offset:
-          name: "Solar Noon: Offset"
-          description: Offset from solar noon (true sun-highest point). Leave blank to disable.
+          name: Offset
+          description: Offset from solar noon. Leave blank to disable.
           default:
           selector:
             text:
         solar_noon_weekdays:
-          name: "Solar Noon: Active Days"
+          name: Active Days
           description: Days of the week on which the solar noon actions run.
           default: [mon, tue, wed, thu, fri, sat, sun]
           selector:
@@ -92,20 +102,25 @@ blueprint:
                 - { label: Saturday, value: sat }
                 - { label: Sunday, value: sun }
         solar_noon_actions:
-          name: "Solar Noon: Actions"
+          name: Actions
           description: Actions to perform at solar noon.
           default: []
           selector:
             action: {}
 
+    sunset:
+      name: Sunset
+      description: Triggered at sunset. Requires the 'sun' integration. Leave offset blank to disable.
+      collapsed: true
+      input:
         sunset_offset:
-          name: "Sunset: Offset"
+          name: Offset
           description: Offset from sunset. Leave blank to disable.
           default:
           selector:
             text:
         sunset_weekdays:
-          name: "Sunset: Active Days"
+          name: Active Days
           description: Days of the week on which the sunset actions run.
           default: [mon, tue, wed, thu, fri, sat, sun]
           selector:
@@ -120,20 +135,25 @@ blueprint:
                 - { label: Saturday, value: sat }
                 - { label: Sunday, value: sun }
         sunset_actions:
-          name: "Sunset: Actions"
+          name: Actions
           description: Actions to perform at sunset.
           default: []
           selector:
             action: {}
 
+    dusk:
+      name: Dusk
+      description: Triggered at dusk. Requires the 'sun' integration. Leave offset blank to disable.
+      collapsed: true
+      input:
         dusk_offset:
-          name: "Dusk: Offset"
+          name: Offset
           description: Offset from dusk. Leave blank to disable.
           default:
           selector:
             text:
         dusk_weekdays:
-          name: "Dusk: Active Days"
+          name: Active Days
           description: Days of the week on which the dusk actions run.
           default: [mon, tue, wed, thu, fri, sat, sun]
           selector:
@@ -148,25 +168,25 @@ blueprint:
                 - { label: Saturday, value: sat }
                 - { label: Sunday, value: sun }
         dusk_actions:
-          name: "Dusk: Actions"
+          name: Actions
           description: Actions to perform at dusk.
           default: []
           selector:
             action: {}
 
-    fixed_time_slots:
-      name: Fixed Time Slots
-      description: Actions triggered at specific times of day.
+    slot_1:
+      name: Slot 1
+      description: Fixed time slot 1. Leave time blank to disable.
       collapsed: true
       input:
         slot_1_time:
-          name: "Slot 1: Time"
-          description: Time for the first fixed daily trigger.
+          name: Time
+          description: Time for this slot. Leave blank to disable.
           default:
           selector:
             time:
         slot_1_weekdays:
-          name: "Slot 1: Active Days"
+          name: Active Days
           description: Days of the week on which Slot 1 actions run.
           default: [mon, tue, wed, thu, fri, sat, sun]
           selector:
@@ -181,20 +201,25 @@ blueprint:
                 - { label: Saturday, value: sat }
                 - { label: Sunday, value: sun }
         slot_1_actions:
-          name: "Slot 1: Actions"
+          name: Actions
           description: Actions to perform at Slot 1 time.
           default: []
           selector:
             action: {}
 
+    slot_2:
+      name: Slot 2
+      description: Fixed time slot 2. Leave time blank to disable.
+      collapsed: true
+      input:
         slot_2_time:
-          name: "Slot 2: Time"
-          description: Time for the second fixed daily trigger.
+          name: Time
+          description: Time for this slot. Leave blank to disable.
           default:
           selector:
             time:
         slot_2_weekdays:
-          name: "Slot 2: Active Days"
+          name: Active Days
           description: Days of the week on which Slot 2 actions run.
           default: [mon, tue, wed, thu, fri, sat, sun]
           selector:
@@ -209,20 +234,25 @@ blueprint:
                 - { label: Saturday, value: sat }
                 - { label: Sunday, value: sun }
         slot_2_actions:
-          name: "Slot 2: Actions"
+          name: Actions
           description: Actions to perform at Slot 2 time.
           default: []
           selector:
             action: {}
 
+    slot_3:
+      name: Slot 3
+      description: Fixed time slot 3. Leave time blank to disable.
+      collapsed: true
+      input:
         slot_3_time:
-          name: "Slot 3: Time"
-          description: Time for the third fixed daily trigger.
+          name: Time
+          description: Time for this slot. Leave blank to disable.
           default:
           selector:
             time:
         slot_3_weekdays:
-          name: "Slot 3: Active Days"
+          name: Active Days
           description: Days of the week on which Slot 3 actions run.
           default: [mon, tue, wed, thu, fri, sat, sun]
           selector:
@@ -237,20 +267,25 @@ blueprint:
                 - { label: Saturday, value: sat }
                 - { label: Sunday, value: sun }
         slot_3_actions:
-          name: "Slot 3: Actions"
+          name: Actions
           description: Actions to perform at Slot 3 time.
           default: []
           selector:
             action: {}
 
+    slot_4:
+      name: Slot 4
+      description: Fixed time slot 4. Leave time blank to disable.
+      collapsed: true
+      input:
         slot_4_time:
-          name: "Slot 4: Time"
-          description: Time for the fourth fixed daily trigger.
+          name: Time
+          description: Time for this slot. Leave blank to disable.
           default:
           selector:
             time:
         slot_4_weekdays:
-          name: "Slot 4: Active Days"
+          name: Active Days
           description: Days of the week on which Slot 4 actions run.
           default: [mon, tue, wed, thu, fri, sat, sun]
           selector:
@@ -265,20 +300,25 @@ blueprint:
                 - { label: Saturday, value: sat }
                 - { label: Sunday, value: sun }
         slot_4_actions:
-          name: "Slot 4: Actions"
+          name: Actions
           description: Actions to perform at Slot 4 time.
           default: []
           selector:
             action: {}
 
+    slot_5:
+      name: Slot 5
+      description: Fixed time slot 5. Leave time blank to disable.
+      collapsed: true
+      input:
         slot_5_time:
-          name: "Slot 5: Time"
-          description: Time for the fifth fixed daily trigger.
+          name: Time
+          description: Time for this slot. Leave blank to disable.
           default:
           selector:
             time:
         slot_5_weekdays:
-          name: "Slot 5: Active Days"
+          name: Active Days
           description: Days of the week on which Slot 5 actions run.
           default: [mon, tue, wed, thu, fri, sat, sun]
           selector:
@@ -293,20 +333,25 @@ blueprint:
                 - { label: Saturday, value: sat }
                 - { label: Sunday, value: sun }
         slot_5_actions:
-          name: "Slot 5: Actions"
+          name: Actions
           description: Actions to perform at Slot 5 time.
           default: []
           selector:
             action: {}
 
+    slot_6:
+      name: Slot 6
+      description: Fixed time slot 6. Leave time blank to disable.
+      collapsed: true
+      input:
         slot_6_time:
-          name: "Slot 6: Time"
-          description: Time for the sixth fixed daily trigger.
+          name: Time
+          description: Time for this slot. Leave blank to disable.
           default:
           selector:
             time:
         slot_6_weekdays:
-          name: "Slot 6: Active Days"
+          name: Active Days
           description: Days of the week on which Slot 6 actions run.
           default: [mon, tue, wed, thu, fri, sat, sun]
           selector:
@@ -321,7 +366,7 @@ blueprint:
                 - { label: Saturday, value: sat }
                 - { label: Sunday, value: sun }
         slot_6_actions:
-          name: "Slot 6: Actions"
+          name: Actions
           description: Actions to perform at Slot 6 time.
           default: []
           selector:
