@@ -19,12 +19,12 @@ blueprint:
 
     dawn:
       name: Dawn
-      description: Triggered at dawn. Requires the 'sun' integration.
+      description: Triggered before sunrise. Use a negative offset (e.g. -00:45:00) to fire before sunrise. Requires the 'sun' integration.
       collapsed: true
       input:
         dawn_offset:
-          name: Offset
-          description: Offset from dawn (e.g. 00:15:00 or -00:15:00). Leave blank to disable.
+          name: Offset from Sunrise
+          description: Negative offset fires before sunrise (e.g. -00:45:00 for civil dawn).
           default: "00:00:00"
           selector:
             text:
@@ -85,15 +85,15 @@ blueprint:
 
     solar_noon:
       name: Solar Noon
-      description: Triggered at solar noon (true sun-highest point). Requires the 'sun' integration.
+      description: Triggered at a fixed time around solar noon.
       collapsed: true
       input:
-        solar_noon_offset:
-          name: Offset
-          description: Offset from solar noon. Leave blank to disable.
-          default: "00:00:00"
+        solar_noon_time:
+          name: Time
+          description: Time to trigger (solar noon is approximately 12:00).
+          default: "12:00:00"
           selector:
-            text:
+            time:
         solar_noon_weekdays:
           name: Active Days
           description: Days of the week on which the solar noon actions run.
@@ -151,12 +151,12 @@ blueprint:
 
     dusk:
       name: Dusk
-      description: Triggered at dusk. Requires the 'sun' integration.
+      description: Triggered after sunset. Use a positive offset (e.g. 00:45:00) to fire after sunset. Requires the 'sun' integration.
       collapsed: true
       input:
         dusk_offset:
-          name: Offset
-          description: Offset from dusk. Leave blank to disable.
+          name: Offset from Sunset
+          description: Positive offset fires after sunset (e.g. 00:45:00 for civil dusk).
           default: "00:00:00"
           selector:
             text:
@@ -390,23 +390,22 @@ blueprint:
 
 trigger:
   - platform: sun
-    event: dawn
+    event: sunrise
     offset: !input dawn_offset
     id: dawn
   - platform: sun
     event: sunrise
     offset: !input sunrise_offset
     id: sunrise
-  - platform: sun
-    event: noon
-    offset: !input solar_noon_offset
+  - platform: time
+    at: !input solar_noon_time
     id: solar_noon
   - platform: sun
     event: sunset
     offset: !input sunset_offset
     id: sunset
   - platform: sun
-    event: dusk
+    event: sunset
     offset: !input dusk_offset
     id: dusk
   - platform: time

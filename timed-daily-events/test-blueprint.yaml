@@ -34,24 +34,23 @@ blueprint:
 
 trigger:
   - platform: sun
-    event: dawn
-    offset: "00:00:00"
+    event: sunrise
+    offset: "-00:45:00"
     id: dawn
   - platform: sun
     event: sunrise
     offset: "00:00:00"
     id: sunrise
-  - platform: sun
-    event: noon
-    offset: "00:00:00"
+  - platform: time
+    at: "12:00:00"
     id: solar_noon
   - platform: sun
     event: sunset
     offset: "00:00:00"
     id: sunset
   - platform: sun
-    event: dusk
-    offset: "00:00:00"
+    event: sunset
+    offset: "00:45:00"
     id: dusk
 
 action:
