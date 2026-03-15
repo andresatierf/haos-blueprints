@@ -9,6 +9,11 @@ blueprint:
   homeassistant:
     min_version: 2025.12.1
   input:
+    sun_events_header:
+      name: "☀️ Sun Events"
+      description: Actions triggered by sun position. Requires the 'sun' integration.
+      input: {}
+
     dawn:
       name: Dawn
       description: Triggered at dawn. Requires the 'sun' integration. Leave offset blank to disable.
@@ -173,6 +178,11 @@ blueprint:
           default: []
           selector:
             action: {}
+
+    fixed_slots_header:
+      name: "🕐 Fixed Time Slots"
+      description: Actions triggered at specific times of day.
+      input: {}
 
     slot_1:
       name: Slot 1
