@@ -1,7 +1,7 @@
 blueprint:
   name: Timed Daily Events
   description: >-
-    Trigger actions at sun events (dawn, sunrise, solar noon, sunset, dusk) and
+    Trigger actions at sunrise and sunset (with optional offsets) and
     up to 6 configurable fixed times throughout the day.
     All slots and their actions are optional. Requires the 'sun' integration for sun slots.
   domain: automation
@@ -17,39 +17,6 @@ blueprint:
         constant:
           value: ""
 
-    dawn:
-      name: Dawn
-      description: Triggered before sunrise. Use a negative offset (e.g. -00:45:00) to fire before sunrise. Requires the 'sun' integration.
-      collapsed: true
-      input:
-        dawn_offset:
-          name: Offset from Sunrise
-          description: Negative offset fires before sunrise (e.g. -00:45:00 for civil dawn).
-          default: "00:00:00"
-          selector:
-            text:
-        dawn_weekdays:
-          name: Active Days
-          description: Days of the week on which the dawn actions run.
-          default: [mon, tue, wed, thu, fri, sat, sun]
-          selector:
-            select:
-              multiple: true
-              options:
-                - { label: Monday, value: mon }
-                - { label: Tuesday, value: tue }
-                - { label: Wednesday, value: wed }
-                - { label: Thursday, value: thu }
-                - { label: Friday, value: fri }
-                - { label: Saturday, value: sat }
-                - { label: Sunday, value: sun }
-        dawn_actions:
-          name: Actions
-          description: Actions to perform at dawn.
-          default: []
-          selector:
-            action: {}
-
     sunrise:
       name: Sunrise
       description: Triggered at sunrise. Requires the 'sun' integration.
@@ -57,7 +24,7 @@ blueprint:
       input:
         sunrise_offset:
           name: Offset
-          description: Offset from sunrise. Leave blank to disable.
+          description: Offset from sunrise (e.g. 00:15:00 or -00:15:00).
           default: "00:00:00"
           selector:
             text:
@@ -83,39 +50,6 @@ blueprint:
           selector:
             action: {}
 
-    solar_noon:
-      name: Solar Noon
-      description: Triggered at a fixed time around solar noon.
-      collapsed: true
-      input:
-        solar_noon_time:
-          name: Time
-          description: Time to trigger (solar noon is approximately 12:00).
-          default: "12:00:00"
-          selector:
-            time:
-        solar_noon_weekdays:
-          name: Active Days
-          description: Days of the week on which the solar noon actions run.
-          default: [mon, tue, wed, thu, fri, sat, sun]
-          selector:
-            select:
-              multiple: true
-              options:
-                - { label: Monday, value: mon }
-                - { label: Tuesday, value: tue }
-                - { label: Wednesday, value: wed }
-                - { label: Thursday, value: thu }
-                - { label: Friday, value: fri }
-                - { label: Saturday, value: sat }
-                - { label: Sunday, value: sun }
-        solar_noon_actions:
-          name: Actions
-          description: Actions to perform at solar noon.
-          default: []
-          selector:
-            action: {}
-
     sunset:
       name: Sunset
       description: Triggered at sunset. Requires the 'sun' integration.
@@ -123,7 +57,7 @@ blueprint:
       input:
         sunset_offset:
           name: Offset
-          description: Offset from sunset. Leave blank to disable.
+          description: Offset from sunset (e.g. 00:15:00 or -00:15:00).
           default: "00:00:00"
           selector:
             text:
@@ -149,39 +83,6 @@ blueprint:
           selector:
             action: {}
 
-    dusk:
-      name: Dusk
-      description: Triggered after sunset. Use a positive offset (e.g. 00:45:00) to fire after sunset. Requires the 'sun' integration.
-      collapsed: true
-      input:
-        dusk_offset:
-          name: Offset from Sunset
-          description: Positive offset fires after sunset (e.g. 00:45:00 for civil dusk).
-          default: "00:00:00"
-          selector:
-            text:
-        dusk_weekdays:
-          name: Active Days
-          description: Days of the week on which the dusk actions run.
-          default: [mon, tue, wed, thu, fri, sat, sun]
-          selector:
-            select:
-              multiple: true
-              options:
-                - { label: Monday, value: mon }
-                - { label: Tuesday, value: tue }
-                - { label: Wednesday, value: wed }
-                - { label: Thursday, value: thu }
-                - { label: Friday, value: fri }
-                - { label: Saturday, value: sat }
-                - { label: Sunday, value: sun }
-        dusk_actions:
-          name: Actions
-          description: Actions to perform at dusk.
-          default: []
-          selector:
-            action: {}
-
     fixed_slots_header:
       name: "🕐 Fixed Time Slots"
       description: Actions triggered at specific times of day.
@@ -192,7 +93,7 @@ blueprint:
 
     slot_1:
       name: Slot 1
-      description: Fixed time slot 1. Leave time blank to disable.
+      description: Fixed time slot 1.
       collapsed: true
       input:
         slot_1_time:
@@ -225,7 +126,7 @@ blueprint:
 
     slot_2:
       name: Slot 2
-      description: Fixed time slot 2. Leave time blank to disable.
+      description: Fixed time slot 2.
       collapsed: true
       input:
         slot_2_time:
@@ -258,7 +159,7 @@ blueprint:
 
     slot_3:
       name: Slot 3
-      description: Fixed time slot 3. Leave time blank to disable.
+      description: Fixed time slot 3.
       collapsed: true
       input:
         slot_3_time:
@@ -291,7 +192,7 @@ blueprint:
 
     slot_4:
       name: Slot 4
-      description: Fixed time slot 4. Leave time blank to disable.
+      description: Fixed time slot 4.
       collapsed: true
       input:
         slot_4_time:
@@ -324,7 +225,7 @@ blueprint:
 
     slot_5:
       name: Slot 5
-      description: Fixed time slot 5. Leave time blank to disable.
+      description: Fixed time slot 5.
       collapsed: true
       input:
         slot_5_time:
@@ -357,7 +258,7 @@ blueprint:
 
     slot_6:
       name: Slot 6
-      description: Fixed time slot 6. Leave time blank to disable.
+      description: Fixed time slot 6.
       collapsed: true
       input:
         slot_6_time:
@@ -391,23 +292,12 @@ blueprint:
 trigger:
   - platform: sun
     event: sunrise
-    offset: !input dawn_offset
-    id: dawn
-  - platform: sun
-    event: sunrise
     offset: !input sunrise_offset
     id: sunrise
-  - platform: time
-    at: !input solar_noon_time
-    id: solar_noon
   - platform: sun
     event: sunset
     offset: !input sunset_offset
     id: sunset
-  - platform: sun
-    event: sunset
-    offset: !input dusk_offset
-    id: dusk
   - platform: time
     at: !input slot_1_time
     id: slot_1
@@ -431,34 +321,16 @@ action:
   - choose:
       - conditions:
           - condition: trigger
-            id: dawn
-          - condition: time
-            weekday: !input dawn_weekdays
-        sequence: !input dawn_actions
-      - conditions:
-          - condition: trigger
             id: sunrise
           - condition: time
             weekday: !input sunrise_weekdays
         sequence: !input sunrise_actions
       - conditions:
           - condition: trigger
-            id: solar_noon
-          - condition: time
-            weekday: !input solar_noon_weekdays
-        sequence: !input solar_noon_actions
-      - conditions:
-          - condition: trigger
             id: sunset
           - condition: time
             weekday: !input sunset_weekdays
         sequence: !input sunset_actions
-      - conditions:
-          - condition: trigger
-            id: dusk
-          - condition: time
-            weekday: !input dusk_weekdays
-        sequence: !input dusk_actions
       - conditions:
           - condition: trigger
             id: slot_1
