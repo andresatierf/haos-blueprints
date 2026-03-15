@@ -20,6 +20,21 @@ blueprint:
           default:
           selector:
             text:
+        dawn_weekdays:
+          name: "Dawn: Active Days"
+          description: Days of the week on which the dawn actions run.
+          default: [mon, tue, wed, thu, fri, sat, sun]
+          selector:
+            select:
+              multiple: true
+              options:
+                - { label: Monday, value: mon }
+                - { label: Tuesday, value: tue }
+                - { label: Wednesday, value: wed }
+                - { label: Thursday, value: thu }
+                - { label: Friday, value: fri }
+                - { label: Saturday, value: sat }
+                - { label: Sunday, value: sun }
         dawn_actions:
           name: "Dawn: Actions"
           description: Actions to perform at dawn.
@@ -33,6 +48,21 @@ blueprint:
           default:
           selector:
             text:
+        sunrise_weekdays:
+          name: "Sunrise: Active Days"
+          description: Days of the week on which the sunrise actions run.
+          default: [mon, tue, wed, thu, fri, sat, sun]
+          selector:
+            select:
+              multiple: true
+              options:
+                - { label: Monday, value: mon }
+                - { label: Tuesday, value: tue }
+                - { label: Wednesday, value: wed }
+                - { label: Thursday, value: thu }
+                - { label: Friday, value: fri }
+                - { label: Saturday, value: sat }
+                - { label: Sunday, value: sun }
         sunrise_actions:
           name: "Sunrise: Actions"
           description: Actions to perform at sunrise.
@@ -46,6 +76,21 @@ blueprint:
           default:
           selector:
             text:
+        solar_noon_weekdays:
+          name: "Solar Noon: Active Days"
+          description: Days of the week on which the solar noon actions run.
+          default: [mon, tue, wed, thu, fri, sat, sun]
+          selector:
+            select:
+              multiple: true
+              options:
+                - { label: Monday, value: mon }
+                - { label: Tuesday, value: tue }
+                - { label: Wednesday, value: wed }
+                - { label: Thursday, value: thu }
+                - { label: Friday, value: fri }
+                - { label: Saturday, value: sat }
+                - { label: Sunday, value: sun }
         solar_noon_actions:
           name: "Solar Noon: Actions"
           description: Actions to perform at solar noon.
@@ -59,6 +104,21 @@ blueprint:
           default:
           selector:
             text:
+        sunset_weekdays:
+          name: "Sunset: Active Days"
+          description: Days of the week on which the sunset actions run.
+          default: [mon, tue, wed, thu, fri, sat, sun]
+          selector:
+            select:
+              multiple: true
+              options:
+                - { label: Monday, value: mon }
+                - { label: Tuesday, value: tue }
+                - { label: Wednesday, value: wed }
+                - { label: Thursday, value: thu }
+                - { label: Friday, value: fri }
+                - { label: Saturday, value: sat }
+                - { label: Sunday, value: sun }
         sunset_actions:
           name: "Sunset: Actions"
           description: Actions to perform at sunset.
@@ -72,6 +132,21 @@ blueprint:
           default:
           selector:
             text:
+        dusk_weekdays:
+          name: "Dusk: Active Days"
+          description: Days of the week on which the dusk actions run.
+          default: [mon, tue, wed, thu, fri, sat, sun]
+          selector:
+            select:
+              multiple: true
+              options:
+                - { label: Monday, value: mon }
+                - { label: Tuesday, value: tue }
+                - { label: Wednesday, value: wed }
+                - { label: Thursday, value: thu }
+                - { label: Friday, value: fri }
+                - { label: Saturday, value: sat }
+                - { label: Sunday, value: sun }
         dusk_actions:
           name: "Dusk: Actions"
           description: Actions to perform at dusk.
@@ -90,6 +165,21 @@ blueprint:
           default:
           selector:
             time:
+        slot_1_weekdays:
+          name: "Slot 1: Active Days"
+          description: Days of the week on which Slot 1 actions run.
+          default: [mon, tue, wed, thu, fri, sat, sun]
+          selector:
+            select:
+              multiple: true
+              options:
+                - { label: Monday, value: mon }
+                - { label: Tuesday, value: tue }
+                - { label: Wednesday, value: wed }
+                - { label: Thursday, value: thu }
+                - { label: Friday, value: fri }
+                - { label: Saturday, value: sat }
+                - { label: Sunday, value: sun }
         slot_1_actions:
           name: "Slot 1: Actions"
           description: Actions to perform at Slot 1 time.
@@ -103,6 +193,21 @@ blueprint:
           default:
           selector:
             time:
+        slot_2_weekdays:
+          name: "Slot 2: Active Days"
+          description: Days of the week on which Slot 2 actions run.
+          default: [mon, tue, wed, thu, fri, sat, sun]
+          selector:
+            select:
+              multiple: true
+              options:
+                - { label: Monday, value: mon }
+                - { label: Tuesday, value: tue }
+                - { label: Wednesday, value: wed }
+                - { label: Thursday, value: thu }
+                - { label: Friday, value: fri }
+                - { label: Saturday, value: sat }
+                - { label: Sunday, value: sun }
         slot_2_actions:
           name: "Slot 2: Actions"
           description: Actions to perform at Slot 2 time.
@@ -116,6 +221,21 @@ blueprint:
           default:
           selector:
             time:
+        slot_3_weekdays:
+          name: "Slot 3: Active Days"
+          description: Days of the week on which Slot 3 actions run.
+          default: [mon, tue, wed, thu, fri, sat, sun]
+          selector:
+            select:
+              multiple: true
+              options:
+                - { label: Monday, value: mon }
+                - { label: Tuesday, value: tue }
+                - { label: Wednesday, value: wed }
+                - { label: Thursday, value: thu }
+                - { label: Friday, value: fri }
+                - { label: Saturday, value: sat }
+                - { label: Sunday, value: sun }
         slot_3_actions:
           name: "Slot 3: Actions"
           description: Actions to perform at Slot 3 time.
@@ -129,6 +249,21 @@ blueprint:
           default:
           selector:
             time:
+        slot_4_weekdays:
+          name: "Slot 4: Active Days"
+          description: Days of the week on which Slot 4 actions run.
+          default: [mon, tue, wed, thu, fri, sat, sun]
+          selector:
+            select:
+              multiple: true
+              options:
+                - { label: Monday, value: mon }
+                - { label: Tuesday, value: tue }
+                - { label: Wednesday, value: wed }
+                - { label: Thursday, value: thu }
+                - { label: Friday, value: fri }
+                - { label: Saturday, value: sat }
+                - { label: Sunday, value: sun }
         slot_4_actions:
           name: "Slot 4: Actions"
           description: Actions to perform at Slot 4 time.
@@ -142,6 +277,21 @@ blueprint:
           default:
           selector:
             time:
+        slot_5_weekdays:
+          name: "Slot 5: Active Days"
+          description: Days of the week on which Slot 5 actions run.
+          default: [mon, tue, wed, thu, fri, sat, sun]
+          selector:
+            select:
+              multiple: true
+              options:
+                - { label: Monday, value: mon }
+                - { label: Tuesday, value: tue }
+                - { label: Wednesday, value: wed }
+                - { label: Thursday, value: thu }
+                - { label: Friday, value: fri }
+                - { label: Saturday, value: sat }
+                - { label: Sunday, value: sun }
         slot_5_actions:
           name: "Slot 5: Actions"
           description: Actions to perform at Slot 5 time.
@@ -155,6 +305,21 @@ blueprint:
           default:
           selector:
             time:
+        slot_6_weekdays:
+          name: "Slot 6: Active Days"
+          description: Days of the week on which Slot 6 actions run.
+          default: [mon, tue, wed, thu, fri, sat, sun]
+          selector:
+            select:
+              multiple: true
+              options:
+                - { label: Monday, value: mon }
+                - { label: Tuesday, value: tue }
+                - { label: Wednesday, value: wed }
+                - { label: Thursday, value: thu }
+                - { label: Friday, value: fri }
+                - { label: Saturday, value: sat }
+                - { label: Sunday, value: sun }
         slot_6_actions:
           name: "Slot 6: Actions"
           description: Actions to perform at Slot 6 time.
@@ -207,46 +372,68 @@ action:
       - conditions:
           - condition: trigger
             id: dawn
+          - condition: time
+            weekday: !input dawn_weekdays
         sequence: !input dawn_actions
       - conditions:
           - condition: trigger
             id: sunrise
+          - condition: time
+            weekday: !input sunrise_weekdays
         sequence: !input sunrise_actions
       - conditions:
           - condition: trigger
             id: solar_noon
+          - condition: time
+            weekday: !input solar_noon_weekdays
         sequence: !input solar_noon_actions
       - conditions:
           - condition: trigger
             id: sunset
+          - condition: time
+            weekday: !input sunset_weekdays
         sequence: !input sunset_actions
       - conditions:
           - condition: trigger
             id: dusk
+          - condition: time
+            weekday: !input dusk_weekdays
         sequence: !input dusk_actions
       - conditions:
           - condition: trigger
             id: slot_1
+          - condition: time
+            weekday: !input slot_1_weekdays
         sequence: !input slot_1_actions
       - conditions:
           - condition: trigger
             id: slot_2
+          - condition: time
+            weekday: !input slot_2_weekdays
         sequence: !input slot_2_actions
       - conditions:
           - condition: trigger
             id: slot_3
+          - condition: time
+            weekday: !input slot_3_weekdays
         sequence: !input slot_3_actions
       - conditions:
           - condition: trigger
             id: slot_4
+          - condition: time
+            weekday: !input slot_4_weekdays
         sequence: !input slot_4_actions
       - conditions:
           - condition: trigger
             id: slot_5
+          - condition: time
+            weekday: !input slot_5_weekdays
         sequence: !input slot_5_actions
       - conditions:
           - condition: trigger
             id: slot_6
+          - condition: time
+            weekday: !input slot_6_weekdays
         sequence: !input slot_6_actions
     default: []
 
