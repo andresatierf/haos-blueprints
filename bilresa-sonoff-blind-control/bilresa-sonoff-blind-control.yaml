@@ -1,0 +1,279 @@
+# ===================================================================
+# IKEA BILRESA E2489 + Sonoff Dual Switch – Electric Blind Control
+# Blueprint Template v1.0.0
+#
+# Internal Versioning:
+#   schema_version: 1.0.0
+#   last_updated: 2026-03-15
+#
+# Changelog:
+#   v1.0.0: Initial release
+#
+# Button Mapping:
+#   Button 1 – Single Press : Turn OFF both Sonoff switches (stop / retract)
+#   Button 1 – Double Press : Turn ON Sonoff switch 1 for 30 s, then OFF
+#   Button 1 – Long Press   : Turn ON Sonoff switch 1 while held, OFF on release
+#   Button 2 – Single Press : Turn OFF both Sonoff switches (stop / retract)
+#   Button 2 – Double Press : Turn ON Sonoff switch 2 for 30 s, then OFF
+#   Button 2 – Long Press   : Turn ON Sonoff switch 2 while held, OFF on release
+#
+# Power-User Notes:
+#   - The BILRESA exposes two event entities, one per physical button.
+#   - long_press fires when the device registers a hold; long_release fires
+#     when the button is physically released.
+#   - mode: restart ensures a new long-press correctly restarts any running
+#     30-second timer from a previous double-press.
+#   - Safety timeout: long_press turns ON the switch and waits up to
+#     long_press_timeout seconds before turning it OFF automatically.
+#     If long_release arrives first, mode: restart cancels the wait and the
+#     long_release branch turns the switch OFF immediately.
+# ===================================================================
+
+blueprint:
+  name: BILRESA + Sonoff Dual Switch – Electric Blind Control
+  author: censay
+  description: >
+    Use the IKEA BILRESA E2489 Matter dual-button remote to control a pair of
+    Sonoff switches that drive electric blinds.
+
+    Button 1 single press  → both switches OFF (stop / full retract).
+    Button 1 double press  → switch 1 ON for 30 seconds then OFF (timed extend).
+    Button 1 long press    → switch 1 ON while held, OFF on release (manual extend).
+
+    Button 2 single press  → both switches OFF (stop / full retract).
+    Button 2 double press  → switch 2 ON for 30 seconds then OFF (timed extend).
+    Button 2 long press    → switch 2 ON while held, OFF on release (manual extend).
+  domain: automation
+  source_url: https://github.com/censay/haos-blueprints
+  homeassistant:
+    min_version: 2025.12.1
+
+  input:
+    # ---------------------------------------------------------------
+    # BILRESA button event entities
+    # ---------------------------------------------------------------
+
+    button1_event:
+      name: Button 1 – Event Entity
+      description: >
+        Select the event entity for Button 1 on the IKEA BILRESA E2489
+        (for example: event.bilresa_dual_button_button_1_2).
+      selector:
+        entity:
+          domain: event
+
+    button2_event:
+      name: Button 2 – Event Entity
+      description: >
+        Select the event entity for Button 2 on the IKEA BILRESA E2489
+        (for example: event.bilresa_dual_button_button_2_2).
+      selector:
+        entity:
+          domain: event
+
+    # ---------------------------------------------------------------
+    # Sonoff switches
+    # ---------------------------------------------------------------
+
+    sonoff_switch_1:
+      name: Sonoff Switch 1
+      description: >
+        The first Sonoff switch (used for extend / timed / hold actions).
+      selector:
+        entity:
+          domain: switch
+
+    sonoff_switch_2:
+      name: Sonoff Switch 2
+      description: >
+        The second Sonoff switch (controlled by Button 2; both switches are
+        turned OFF on single press of either button).
+      selector:
+        entity:
+          domain: switch
+
+    run_time:
+      name: Blind Run Time (seconds)
+      description: >
+        How long (in seconds) the switch stays ON after a double press before
+        turning off automatically.
+      default: 30
+      selector:
+        number:
+          min: 1
+          max: 30
+          unit_of_measurement: seconds
+          mode: box
+
+    long_press_timeout:
+      name: Long Press Safety Timeout (seconds)
+      description: >
+        Maximum time (in seconds) a switch can stay ON during a long press before
+        turning off automatically, in case the release event is not received.
+      default: 40
+      selector:
+        number:
+          min: 30
+          max: 60
+          unit_of_measurement: seconds
+          mode: box
+
+# ===================================================================
+# AUTOMATION LOGIC
+# ===================================================================
+
+trigger:
+  - platform: state
+    id: button1
+    entity_id: !input button1_event
+    not_from: "unavailable"
+    not_to: "unavailable"
+  - platform: state
+    id: button2
+    entity_id: !input button2_event
+    not_from: "unavailable"
+    not_to: "unavailable"
+
+condition: []
+
+action:
+  - variables:
+      press_type: "{{ trigger.to_state.attributes.event_type }}"
+      trigger_id: "{{ trigger.id }}"
+      run_time: !input run_time
+      long_press_timeout: !input long_press_timeout
+
+  - choose:
+      # -------------------------------------------------------------
+      # BUTTON 1 – Single Press: turn OFF both switches
+      # -------------------------------------------------------------
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ trigger_id == 'button1' and press_type == 'multi_press_1' }}
+        sequence:
+          - action: switch.turn_off
+            target:
+              entity_id:
+                - !input sonoff_switch_1
+                - !input sonoff_switch_2
+
+      # -------------------------------------------------------------
+      # BUTTON 1 – Double Press: switch 1 ON for 30 s then OFF
+      # -------------------------------------------------------------
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ trigger_id == 'button1' and press_type == 'multi_press_2' }}
+        sequence:
+          - action: switch.turn_off
+            target:
+              entity_id: !input sonoff_switch_2
+          - action: switch.turn_on
+            target:
+              entity_id: !input sonoff_switch_1
+          - delay:
+              seconds: "{{ run_time }}"
+          - action: switch.turn_off
+            target:
+              entity_id: !input sonoff_switch_1
+
+      # -------------------------------------------------------------
+      # BUTTON 1 – Long Press (on press): switch 1 ON; safety timeout OFF
+      # -------------------------------------------------------------
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ trigger_id == 'button1' and press_type == 'long_press' }}
+        sequence:
+          - action: switch.turn_off
+            target:
+              entity_id: !input sonoff_switch_2
+          - action: switch.turn_on
+            target:
+              entity_id: !input sonoff_switch_1
+          - delay:
+              seconds: "{{ long_press_timeout }}"
+          - action: switch.turn_off
+            target:
+              entity_id: !input sonoff_switch_1
+
+      # -------------------------------------------------------------
+      # BUTTON 1 – Long Release (on release): switch 1 OFF
+      # -------------------------------------------------------------
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ trigger_id == 'button1' and press_type == 'long_release' }}
+        sequence:
+          - action: switch.turn_off
+            target:
+              entity_id: !input sonoff_switch_1
+
+      # -------------------------------------------------------------
+      # BUTTON 2 – Single Press: turn OFF both switches
+      # -------------------------------------------------------------
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ trigger_id == 'button2' and press_type == 'multi_press_1' }}
+        sequence:
+          - action: switch.turn_off
+            target:
+              entity_id:
+                - !input sonoff_switch_1
+                - !input sonoff_switch_2
+
+      # -------------------------------------------------------------
+      # BUTTON 2 – Double Press: switch 2 ON for 30 s then OFF
+      # -------------------------------------------------------------
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ trigger_id == 'button2' and press_type == 'multi_press_2' }}
+        sequence:
+          - action: switch.turn_off
+            target:
+              entity_id: !input sonoff_switch_1
+          - action: switch.turn_on
+            target:
+              entity_id: !input sonoff_switch_2
+          - delay:
+              seconds: "{{ run_time }}"
+          - action: switch.turn_off
+            target:
+              entity_id: !input sonoff_switch_2
+
+      # -------------------------------------------------------------
+      # BUTTON 2 – Long Press (on press): switch 2 ON; safety timeout OFF
+      # -------------------------------------------------------------
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ trigger_id == 'button2' and press_type == 'long_press' }}
+        sequence:
+          - action: switch.turn_off
+            target:
+              entity_id: !input sonoff_switch_1
+          - action: switch.turn_on
+            target:
+              entity_id: !input sonoff_switch_2
+          - delay:
+              seconds: "{{ long_press_timeout }}"
+          - action: switch.turn_off
+            target:
+              entity_id: !input sonoff_switch_2
+
+      # -------------------------------------------------------------
+      # BUTTON 2 – Long Release (on release): switch 2 OFF
+      # -------------------------------------------------------------
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ trigger_id == 'button2' and press_type == 'long_release' }}
+        sequence:
+          - action: switch.turn_off
+            target:
+              entity_id: !input sonoff_switch_2
+
+mode: restart
