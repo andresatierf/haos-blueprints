@@ -12,7 +12,10 @@ blueprint:
     sun_events_header:
       name: "☀️ Sun Events"
       description: Actions triggered by sun position. Requires the 'sun' integration.
-      input: {}
+      default: ""
+      selector:
+        constant:
+          value: ""
 
     dawn:
       name: Dawn
@@ -182,7 +185,10 @@ blueprint:
     fixed_slots_header:
       name: "🕐 Fixed Time Slots"
       description: Actions triggered at specific times of day.
-      input: {}
+      default: ""
+      selector:
+        constant:
+          value: ""
 
     slot_1:
       name: Slot 1
