@@ -398,7 +398,7 @@ trigger:
     offset: !input sunrise_offset
     id: sunrise
   - platform: sun
-    event: solar_noon
+    event: noon
     offset: !input solar_noon_offset
     id: solar_noon
   - platform: sun
