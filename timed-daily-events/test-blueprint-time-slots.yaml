@@ -1,0 +1,88 @@
+blueprint:
+  name: "Test: Fixed Time Slots"
+  description: Minimal blueprint to test all fixed time slot triggers.
+  domain: automation
+  source_url: https://github.com/censay/haos-blueprints
+  homeassistant:
+    min_version: 2025.12.1
+  input:
+    slot_1_actions:
+      name: Slot 1 Actions
+      default: []
+      selector:
+        action: {}
+    slot_2_actions:
+      name: Slot 2 Actions
+      default: []
+      selector:
+        action: {}
+    slot_3_actions:
+      name: Slot 3 Actions
+      default: []
+      selector:
+        action: {}
+    slot_4_actions:
+      name: Slot 4 Actions
+      default: []
+      selector:
+        action: {}
+    slot_5_actions:
+      name: Slot 5 Actions
+      default: []
+      selector:
+        action: {}
+    slot_6_actions:
+      name: Slot 6 Actions
+      default: []
+      selector:
+        action: {}
+
+trigger:
+  - platform: time
+    at: "06:00:00"
+    id: slot_1
+  - platform: time
+    at: "08:00:00"
+    id: slot_2
+  - platform: time
+    at: "10:00:00"
+    id: slot_3
+  - platform: time
+    at: "12:00:00"
+    id: slot_4
+  - platform: time
+    at: "14:00:00"
+    id: slot_5
+  - platform: time
+    at: "16:00:00"
+    id: slot_6
+
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: slot_1
+        sequence: !input slot_1_actions
+      - conditions:
+          - condition: trigger
+            id: slot_2
+        sequence: !input slot_2_actions
+      - conditions:
+          - condition: trigger
+            id: slot_3
+        sequence: !input slot_3_actions
+      - conditions:
+          - condition: trigger
+            id: slot_4
+        sequence: !input slot_4_actions
+      - conditions:
+          - condition: trigger
+            id: slot_5
+        sequence: !input slot_5_actions
+      - conditions:
+          - condition: trigger
+            id: slot_6
+        sequence: !input slot_6_actions
+    default: []
+
+mode: parallel
