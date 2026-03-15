@@ -19,13 +19,13 @@ blueprint:
 
     dawn:
       name: Dawn
-      description: Triggered at dawn. Requires the 'sun' integration. Leave offset blank to disable.
+      description: Triggered at dawn. Requires the 'sun' integration.
       collapsed: true
       input:
         dawn_offset:
           name: Offset
           description: Offset from dawn (e.g. 00:15:00 or -00:15:00). Leave blank to disable.
-          default:
+          default: "00:00:00"
           selector:
             text:
         dawn_weekdays:
@@ -52,13 +52,13 @@ blueprint:
 
     sunrise:
       name: Sunrise
-      description: Triggered at sunrise. Requires the 'sun' integration. Leave offset blank to disable.
+      description: Triggered at sunrise. Requires the 'sun' integration.
       collapsed: true
       input:
         sunrise_offset:
           name: Offset
           description: Offset from sunrise. Leave blank to disable.
-          default:
+          default: "00:00:00"
           selector:
             text:
         sunrise_weekdays:
@@ -85,13 +85,13 @@ blueprint:
 
     solar_noon:
       name: Solar Noon
-      description: Triggered at solar noon (true sun-highest point). Requires the 'sun' integration. Leave offset blank to disable.
+      description: Triggered at solar noon (true sun-highest point). Requires the 'sun' integration.
       collapsed: true
       input:
         solar_noon_offset:
           name: Offset
           description: Offset from solar noon. Leave blank to disable.
-          default:
+          default: "00:00:00"
           selector:
             text:
         solar_noon_weekdays:
@@ -118,13 +118,13 @@ blueprint:
 
     sunset:
       name: Sunset
-      description: Triggered at sunset. Requires the 'sun' integration. Leave offset blank to disable.
+      description: Triggered at sunset. Requires the 'sun' integration.
       collapsed: true
       input:
         sunset_offset:
           name: Offset
           description: Offset from sunset. Leave blank to disable.
-          default:
+          default: "00:00:00"
           selector:
             text:
         sunset_weekdays:
@@ -151,13 +151,13 @@ blueprint:
 
     dusk:
       name: Dusk
-      description: Triggered at dusk. Requires the 'sun' integration. Leave offset blank to disable.
+      description: Triggered at dusk. Requires the 'sun' integration.
       collapsed: true
       input:
         dusk_offset:
           name: Offset
           description: Offset from dusk. Leave blank to disable.
-          default:
+          default: "00:00:00"
           selector:
             text:
         dusk_weekdays:
@@ -197,8 +197,8 @@ blueprint:
       input:
         slot_1_time:
           name: Time
-          description: Time for this slot. Leave blank to disable.
-          default:
+          description: Time for this slot.
+          default: "00:00:00"
           selector:
             time:
         slot_1_weekdays:
@@ -230,8 +230,8 @@ blueprint:
       input:
         slot_2_time:
           name: Time
-          description: Time for this slot. Leave blank to disable.
-          default:
+          description: Time for this slot.
+          default: "00:00:00"
           selector:
             time:
         slot_2_weekdays:
@@ -263,8 +263,8 @@ blueprint:
       input:
         slot_3_time:
           name: Time
-          description: Time for this slot. Leave blank to disable.
-          default:
+          description: Time for this slot.
+          default: "00:00:00"
           selector:
             time:
         slot_3_weekdays:
@@ -296,8 +296,8 @@ blueprint:
       input:
         slot_4_time:
           name: Time
-          description: Time for this slot. Leave blank to disable.
-          default:
+          description: Time for this slot.
+          default: "00:00:00"
           selector:
             time:
         slot_4_weekdays:
@@ -329,8 +329,8 @@ blueprint:
       input:
         slot_5_time:
           name: Time
-          description: Time for this slot. Leave blank to disable.
-          default:
+          description: Time for this slot.
+          default: "00:00:00"
           selector:
             time:
         slot_5_weekdays:
@@ -362,8 +362,8 @@ blueprint:
       input:
         slot_6_time:
           name: Time
-          description: Time for this slot. Leave blank to disable.
-          default:
+          description: Time for this slot.
+          default: "00:00:00"
           selector:
             time:
         slot_6_weekdays:
