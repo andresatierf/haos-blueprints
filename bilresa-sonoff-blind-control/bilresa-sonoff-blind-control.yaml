@@ -1,20 +1,21 @@
 # ===================================================================
 # IKEA BILRESA E2489 + Sonoff Dual Switch – Electric Blind Control
-# Blueprint Template v1.0.0
+# Blueprint Template v1.1.0
 #
 # Internal Versioning:
-#   schema_version: 1.0.0
-#   last_updated: 2026-03-15
+#   schema_version: 1.1.0
+#   last_updated: 2026-03-26
 #
 # Changelog:
+#   v1.1.0: Add duration helper for adjustable run time via single press
 #   v1.0.0: Initial release
 #
 # Button Mapping:
-#   Button 1 – Single Press : Turn OFF both Sonoff switches (stop / retract)
-#   Button 1 – Double Press : Turn ON Sonoff switch 1 for 30 s, then OFF
+#   Button 1 – Single Press : If running → stop; if idle → increase duration +15s
+#   Button 1 – Double Press : Turn ON Sonoff switch 1 for helper value, then OFF
 #   Button 1 – Long Press   : Turn ON Sonoff switch 1 while held, OFF on release
-#   Button 2 – Single Press : Turn OFF both Sonoff switches (stop / retract)
-#   Button 2 – Double Press : Turn ON Sonoff switch 2 for 30 s, then OFF
+#   Button 2 – Single Press : If running → stop; if idle → decrease duration -15s
+#   Button 2 – Double Press : Turn ON Sonoff switch 2 for helper value, then OFF
 #   Button 2 – Long Press   : Turn ON Sonoff switch 2 while held, OFF on release
 #
 # Power-User Notes:
@@ -27,6 +28,7 @@
 #     long_press_timeout seconds before turning it OFF automatically.
 #     If long_release arrives first, mode: restart cancels the wait and the
 #     long_release branch turns the switch OFF immediately.
+#   - Duration helper (input_number): values adjust by 15s increments (15-30s range).
 # ===================================================================
 
 blueprint:
@@ -36,13 +38,15 @@ blueprint:
     Use the IKEA BILRESA E2489 Matter dual-button remote to control a pair of
     Sonoff switches that drive electric blinds.
 
-    Button 1 single press  → both switches OFF (stop / full retract).
-    Button 1 double press  → switch 1 ON for 30 seconds then OFF (timed extend).
+    Button 1 single press  → if running: stop; if idle: increase duration +15s.
+    Button 1 double press  → switch 1 ON for helper value then OFF (timed extend).
     Button 1 long press    → switch 1 ON while held, OFF on release (manual extend).
 
-    Button 2 single press  → both switches OFF (stop / full retract).
-    Button 2 double press  → switch 2 ON for 30 seconds then OFF (timed extend).
+    Button 2 single press  → if running: stop; if idle: decrease duration -15s.
+    Button 2 double press  → switch 2 ON for helper value then OFF (timed extend).
     Button 2 long press    → switch 2 ON while held, OFF on release (manual extend).
+
+    Duration helper: an input_number entity (15-30s range) adjusted by single press.
   domain: automation
   source_url: https://github.com/censay/haos-blueprints
   homeassistant:
@@ -105,6 +109,16 @@ blueprint:
           unit_of_measurement: seconds
           mode: box
 
+    duration_helper:
+      name: Duration Helper
+      description: >
+        An input_number helper entity (created in Home Assistant) that stores
+        the adjustable run duration. Single press on Button 1 increases by 15s,
+        Button 2 decreases by 15s. Valid range: 15-30 seconds.
+      selector:
+        entity:
+          domain: input_number
+
     long_press_timeout:
       name: Long Press Safety Timeout (seconds)
       description: >
@@ -142,24 +156,40 @@ action:
       trigger_id: "{{ trigger.id }}"
       run_time: !input run_time
       long_press_timeout: !input long_press_timeout
+      duration_helper: !input duration_helper
 
   - choose:
       # -------------------------------------------------------------
-      # BUTTON 1 – Single Press: turn OFF both switches
+      # BUTTON 1 – Single Press: stop if running, else increment duration
       # -------------------------------------------------------------
       - conditions:
           - condition: template
             value_template: >
               {{ trigger_id == 'button1' and press_type == 'multi_press_1' }}
         sequence:
-          - action: switch.turn_off
-            target:
-              entity_id:
-                - !input sonoff_switch_1
-                - !input sonoff_switch_2
+          - choose:
+              - conditions:
+                  - condition: or
+                    conditions:
+                      - condition: state
+                        entity_id: !input sonoff_switch_1
+                        state: "on"
+                      - condition: state
+                        entity_id: !input sonoff_switch_2
+                        state: "on"
+                sequence:
+                  - action: switch.turn_off
+                    target:
+                      entity_id:
+                        - !input sonoff_switch_1
+                        - !input sonoff_switch_2
+            default:
+              - action: input_number.increment
+                target:
+                  entity_id: !input duration_helper
 
       # -------------------------------------------------------------
-      # BUTTON 1 – Double Press: switch 1 ON for 30 s then OFF
+      # BUTTON 1 – Double Press: switch 1 ON for helper value then OFF
       # -------------------------------------------------------------
       - conditions:
           - condition: template
@@ -173,7 +203,7 @@ action:
             target:
               entity_id: !input sonoff_switch_1
           - delay:
-              seconds: "{{ run_time }}"
+              seconds: "{{ states(duration_helper) | int(30) }}"
           - action: switch.turn_off
             target:
               entity_id: !input sonoff_switch_1
@@ -211,21 +241,36 @@ action:
               entity_id: !input sonoff_switch_1
 
       # -------------------------------------------------------------
-      # BUTTON 2 – Single Press: turn OFF both switches
+      # BUTTON 2 – Single Press: stop if running, else decrement duration
       # -------------------------------------------------------------
       - conditions:
           - condition: template
             value_template: >
               {{ trigger_id == 'button2' and press_type == 'multi_press_1' }}
         sequence:
-          - action: switch.turn_off
-            target:
-              entity_id:
-                - !input sonoff_switch_1
-                - !input sonoff_switch_2
+          - choose:
+              - conditions:
+                  - condition: or
+                    conditions:
+                      - condition: state
+                        entity_id: !input sonoff_switch_1
+                        state: "on"
+                      - condition: state
+                        entity_id: !input sonoff_switch_2
+                        state: "on"
+                sequence:
+                  - action: switch.turn_off
+                    target:
+                      entity_id:
+                        - !input sonoff_switch_1
+                        - !input sonoff_switch_2
+            default:
+              - action: input_number.decrement
+                target:
+                  entity_id: !input duration_helper
 
       # -------------------------------------------------------------
-      # BUTTON 2 – Double Press: switch 2 ON for 30 s then OFF
+      # BUTTON 2 – Double Press: switch 2 ON for helper value then OFF
       # -------------------------------------------------------------
       - conditions:
           - condition: template
@@ -239,7 +284,7 @@ action:
             target:
               entity_id: !input sonoff_switch_2
           - delay:
-              seconds: "{{ run_time }}"
+              seconds: "{{ states(duration_helper) | int(30) }}"
           - action: switch.turn_off
             target:
               entity_id: !input sonoff_switch_2
