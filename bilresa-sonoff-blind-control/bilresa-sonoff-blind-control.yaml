@@ -220,21 +220,16 @@ action:
   - variables:
       duration_helper: >
         {% if duration_label %}
-          {% set all_helpers = label_entities(duration_label) | select('match', '^input_number\\.') | list %}
-          {% set area_helper = namespace(entity=none) %}
-          {% set global_helper = namespace(entity=none) %}
-          {% for h in all_helpers %}
-            {% if target_area and h | area_name == target_area %}
-              {% set area_helper.entity = h %}
-            {% elif h | area_name == none or h | area_name == '' %}
-              {% set global_helper.entity = h %}
+          {% set ns = namespace(area=none, global=none) %}
+          {% for h in label_entities(duration_label) | select('match', '^input_number\.') %}
+            {% set h_area = area_name(h) %}
+            {% if target_area and h_area == target_area %}
+              {% set ns.area = h %}
+            {% elif not h_area %}
+              {% set ns.global = h %}
             {% endif %}
           {% endfor %}
-          {% if area_helper.entity %}
-            {{ area_helper.entity }}
-          {% elif global_helper.entity %}
-            {{ global_helper.entity }}
-          {% endif %}
+          {{ ns.area if ns.area else ns.global }}
         {% endif %}
 
   - variables:
