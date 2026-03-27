@@ -219,17 +219,10 @@ action:
 
   - variables:
       duration_helper: >
-        {% if duration_label %}
-          {% set ns = namespace(area=none, global=none) %}
-          {% for h in label_entities(duration_label) | select('match', '^input_number\.') %}
-            {% set h_area = area_name(h) %}
-            {% if target_area and h_area == target_area %}
-              {% set ns.area = h %}
-            {% elif not h_area %}
-              {% set ns.global = h %}
-            {% endif %}
-          {% endfor %}
-          {{ ns.area if ns.area else ns.global }}
+        {% if duration_label and target_area %}
+          {{ (area_entities(target_area) | select('match', '^input_number\.') | intersect(label_entities(duration_label)) | list).0 }}
+        {% elif duration_label %}
+          {{ (label_entities(duration_label) | select('match', '^input_number\.') | list).0 }}
         {% endif %}
 
   - variables:
