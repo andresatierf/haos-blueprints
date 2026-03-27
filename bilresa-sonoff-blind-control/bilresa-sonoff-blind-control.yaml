@@ -141,6 +141,7 @@ blueprint:
         Secondary label for duration helpers. When no target area is selected,
         the helper must have both duration_label AND this fallback label.
         This helps narrow down to a specific helper when not using area filtering.
+      default:
       selector:
         label:
 
