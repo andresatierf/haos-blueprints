@@ -97,6 +97,7 @@ blueprint:
       description: >
         Optional area to filter switches and helpers. If not specified,
         all devices matching the labels will be targeted.
+      default:
       selector:
         area:
 
