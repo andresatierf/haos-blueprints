@@ -201,17 +201,17 @@ action:
   - variables:
       open_switches: >
         {% if target_area %}
-          {{ area_entities(target_area) | select('match', '^switch\\.') | select('in', label_entities(switch_open_label)) }}
+          {{ area_entities(target_area) | select('match', '^switch\\.') | select('in', label_entities(switch_open_label)) | list }}
         {% else %}
-          {{ label_entities(switch_open_label) | select('match', '^switch\\.') }}
+          {{ label_entities(switch_open_label) | select('match', '^switch\\.') | list }}
         {% endif %}
 
   - variables:
       close_switches: >
         {% if target_area %}
-          {{ area_entities(target_area) | select('match', '^switch\\.') | select('in', label_entities(switch_close_label)) }}
+          {{ area_entities(target_area) | select('match', '^switch\\.') | select('in', label_entities(switch_close_label)) | list }}
         {% else %}
-          {{ label_entities(switch_close_label) | select('match', '^switch\\.') }}
+          {{ label_entities(switch_close_label) | select('match', '^switch\\.') | list }}
         {% endif %}
 
   - variables:
