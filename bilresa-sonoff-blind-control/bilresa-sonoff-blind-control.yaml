@@ -1,12 +1,13 @@
 # ===================================================================
 # IKEA BILRESA E2489 + Sonoff Dual Switch – Electric Blind Control
-# Blueprint Template v2.1.0
+# Blueprint Template v2.2.0
 #
 # Internal Versioning:
-#   schema_version: 2.1.0
-#   last_updated: 2026-03-26
+#   schema_version: 2.2.0
+#   last_updated: 2026-03-27
 #
 # Changelog:
+#   v2.2.0: Add duration_fallback_label for helper targeting without area
 #   v2.1.0: Add separate open/close switch labels for dual-direction control
 #   v2.0.0: Add area+label targeting with global fallback duration
 #   v1.1.0: Add duration helper for adjustable run time via single press
@@ -23,20 +24,10 @@
 # Targeting:
 #   - Open switches: switch_open_label AND (optional) target_area
 #   - Close switches: switch_close_label AND (optional) target_area
-#   - Duration helpers: duration_label AND (optional) target_area
-#   - If no area-specific helper is found, the global helper (no area) is used
-#   - If no duration helpers are found, global_duration is used as fallback
-#
-# Power-User Notes:
-#   - The BILRESA exposes two event entities, one per physical button.
-#   - long_press fires when the device registers a hold; long_release fires
-#     when the button is physically released.
-#   - mode: restart ensures a new press correctly restarts any running timer.
-#   - Safety timeout: long_press turns ON the switch and waits up to
-#     long_press_timeout seconds before turning it OFF automatically.
-#     If long_release arrives first, mode: restart cancels the wait and the
-#     long_release branch turns the switch OFF immediately.
-#   - Duration helpers follow the same area+label pattern as switches
+#   - Duration helpers:
+#       * With area: helper with duration_label in target area
+#       * Without area: helper with BOTH duration_label AND duration_fallback_label
+#       * If no helpers found, global_duration is used as fallback
 # ===================================================================
 
 blueprint:
@@ -49,6 +40,8 @@ blueprint:
     Targeting is done by labels (switches and helpers) with an optional area filter.
     Duration helpers can be per-area (with a fallback global helper) or use a
     default value if no helpers are found.
+    When no area is selected, use both duration_label AND duration_fallback_label
+    to target the helper.
 
     Button 1 → Open switches (switch_open_label)
     Button 2 → Close switches (switch_close_label)
@@ -137,7 +130,17 @@ blueprint:
         Label that identifies the duration helpers.
         If a helper with this label exists in the target area, its value is used.
         Otherwise, the global helper (same label, no area) is used.
+        If no area is selected, the helper must have both this label AND the fallback label.
         If no helpers are found, global_duration is used.
+      selector:
+        label:
+
+    duration_fallback_label:
+      name: Duration Helper Fallback Label (Optional)
+      description: >
+        Secondary label for duration helpers. When no target area is selected,
+        the helper must have both duration_label AND this fallback label.
+        This helps narrow down to a specific helper when not using area filtering.
       selector:
         label:
 
@@ -177,6 +180,7 @@ variables:
   switch_open_label: !input switch_open_label
   switch_close_label: !input switch_close_label
   duration_label: !input duration_label
+  duration_fallback_label: !input duration_fallback_label
   global_duration: !input global_duration
   long_press_timeout: !input long_press_timeout
 
@@ -222,6 +226,8 @@ action:
       duration_helper: >
         {% if duration_label and target_area %}
           {{ (area_entities(target_area) | select('match', '^input_number\.') | intersect(label_entities(duration_label)) | list).0 }}
+        {% elif duration_label and duration_fallback_label %}
+          {{ (label_entities(duration_label) | select('match', '^input_number\.') | intersect(label_entities(duration_fallback_label)) | list).0 }}
         {% elif duration_label %}
           {{ (label_entities(duration_label) | select('match', '^input_number\.') | list).0 }}
         {% endif %}
