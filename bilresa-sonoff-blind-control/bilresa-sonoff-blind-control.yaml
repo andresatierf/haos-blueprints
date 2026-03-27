@@ -1,52 +1,65 @@
 # ===================================================================
 # IKEA BILRESA E2489 + Sonoff Dual Switch – Electric Blind Control
-# Blueprint Template v1.1.0
+# Blueprint Template v2.1.0
 #
 # Internal Versioning:
-#   schema_version: 1.1.0
+#   schema_version: 2.1.0
 #   last_updated: 2026-03-26
 #
 # Changelog:
+#   v2.1.0: Add separate open/close switch labels for dual-direction control
+#   v2.0.0: Add area+label targeting with global fallback duration
 #   v1.1.0: Add duration helper for adjustable run time via single press
 #   v1.0.0: Initial release
 #
 # Button Mapping:
 #   Button 1 – Single Press : If running → stop; if idle → increase duration +15s
-#   Button 1 – Double Press : Turn ON Sonoff switch 1 for helper value, then OFF
-#   Button 1 – Long Press   : Turn ON Sonoff switch 1 while held, OFF on release
+#   Button 1 – Double Press : Turn ON open switches for duration, then OFF
+#   Button 1 – Long Press   : Turn ON open switches while held, OFF on release
 #   Button 2 – Single Press : If running → stop; if idle → decrease duration -15s
-#   Button 2 – Double Press : Turn ON Sonoff switch 2 for helper value, then OFF
-#   Button 2 – Long Press   : Turn ON Sonoff switch 2 while held, OFF on release
+#   Button 2 – Double Press : Turn ON close switches for duration, then OFF
+#   Button 2 – Long Press   : Turn ON close switches while held, OFF on release
+#
+# Targeting:
+#   - Open switches: switch_open_label AND (optional) target_area
+#   - Close switches: switch_close_label AND (optional) target_area
+#   - Duration helpers: duration_label AND (optional) target_area
+#   - If no area-specific helper is found, the global helper (no area) is used
+#   - If no duration helpers are found, global_duration is used as fallback
 #
 # Power-User Notes:
 #   - The BILRESA exposes two event entities, one per physical button.
 #   - long_press fires when the device registers a hold; long_release fires
 #     when the button is physically released.
-#   - mode: restart ensures a new long-press correctly restarts any running
-#     30-second timer from a previous double-press.
+#   - mode: restart ensures a new press correctly restarts any running timer.
 #   - Safety timeout: long_press turns ON the switch and waits up to
 #     long_press_timeout seconds before turning it OFF automatically.
 #     If long_release arrives first, mode: restart cancels the wait and the
 #     long_release branch turns the switch OFF immediately.
-#   - Duration helper (input_number): values adjust by 15s increments (15-30s range).
+#   - Duration helpers follow the same area+label pattern as switches
 # ===================================================================
 
 blueprint:
-  name: BILRESA + Sonoff Dual Switch – Electric Blind Control
+  name: BILRESA + Sonoff Dual Switch – Electric Blind Control (v2)
   author: censay
   description: >
-    Use the IKEA BILRESA E2489 Matter dual-button remote to control a pair of
-    Sonoff switches that drive electric blinds.
+    Use the IKEA BILRESA E2489 Matter dual-button remote to control electric
+    blinds via Sonoff switches.
+
+    Targeting is done by labels (switches and helpers) with an optional area filter.
+    Duration helpers can be per-area (with a fallback global helper) or use a
+    default value if no helpers are found.
+
+    Button 1 → Open switches (switch_open_label)
+    Button 2 → Close switches (switch_close_label)
 
     Button 1 single press  → if running: stop; if idle: increase duration +15s.
-    Button 1 double press  → switch 1 ON for helper value then OFF (timed extend).
-    Button 1 long press    → switch 1 ON while held, OFF on release (manual extend).
+    Button 1 double press  → Open ON for duration then OFF (timed extend).
+    Button 1 long press    → Open ON while held, OFF on release (manual extend).
 
     Button 2 single press  → if running: stop; if idle: decrease duration -15s.
-    Button 2 double press  → switch 2 ON for helper value then OFF (timed extend).
-    Button 2 long press    → switch 2 ON while held, OFF on release (manual extend).
-
-    Duration helper: an input_number entity (15-30s range) adjusted by single press.
+    Button 2 double press  → Close ON for duration then OFF (timed extend).
+    Button 2 long press    → Close ON while held, OFF on release (manual extend).
   domain: automation
   source_url: https://github.com/censay/haos-blueprints
   homeassistant:
@@ -76,35 +89,70 @@ blueprint:
           domain: event
 
     # ---------------------------------------------------------------
-    # Sonoff switches
+    # Area filter (optional - applies to switches and helpers)
     # ---------------------------------------------------------------
 
-    sonoff_switch_1:
-      name: Sonoff Switch 1
+    target_area:
+      name: Target Area (Optional)
       description: >
-        The first Sonoff switch (used for extend / timed / hold actions).
+        Optional area to filter switches and helpers. If not specified,
+        all devices matching the labels will be targeted.
       selector:
-        entity:
-          domain: switch
+        area:
 
-    sonoff_switch_2:
-      name: Sonoff Switch 2
-      description: >
-        The second Sonoff switch (controlled by Button 2; both switches are
-        turned OFF on single press of either button).
-      selector:
-        entity:
-          domain: switch
+    # ---------------------------------------------------------------
+    # Switch targeting - OPEN direction (Button 1)
+    # ---------------------------------------------------------------
 
-    duration_helper:
-      name: Duration Helper
+    switch_open_label:
+      name: Switch Open Label (Required)
       description: >
-        An input_number helper entity (created in Home Assistant) that stores
-        the adjustable run duration. Single press on Button 1 increases by 15s,
-        Button 2 decreases by 15s. Valid range: 15-30 seconds.
+        Label that identifies the Sonoff switches for OPENING blinds.
+        All switches with this label will be controlled by Button 1.
+        Example: "open" or "blind_open"
       selector:
-        entity:
-          domain: input_number
+        label:
+
+    # ---------------------------------------------------------------
+    # Switch targeting - CLOSE direction (Button 2)
+    # ---------------------------------------------------------------
+
+    switch_close_label:
+      name: Switch Close Label (Required)
+      description: >
+        Label that identifies the Sonoff switches for CLOSING blinds.
+        All switches with this label will be controlled by Button 2.
+        Example: "close" or "blind_close"
+      selector:
+        label:
+
+    # ---------------------------------------------------------------
+    # Duration helper targeting
+    # ---------------------------------------------------------------
+
+    duration_label:
+      name: Duration Helper Label (Optional)
+      description: >
+        Label that identifies the duration helpers.
+        If a helper with this label exists in the target area, its value is used.
+        Otherwise, the global helper (same label, no area) is used.
+        If no helpers are found, global_duration is used.
+      selector:
+        label:
+
+    global_duration:
+      name: Global Duration (seconds)
+      description: >
+        Default duration in seconds when no duration helpers are found.
+        Used as fallback when duration_label is not set or no matching
+        helpers exist.
+      default: 15
+      selector:
+        number:
+          min: 5
+          max: 120
+          unit_of_measurement: seconds
+          mode: box
 
     long_press_timeout:
       name: Long Press Safety Timeout (seconds)
@@ -122,6 +170,14 @@ blueprint:
 # ===================================================================
 # AUTOMATION LOGIC
 # ===================================================================
+
+variables:
+  target_area: !input target_area
+  switch_open_label: !input switch_open_label
+  switch_close_label: !input switch_close_label
+  duration_label: !input duration_label
+  global_duration: !input global_duration
+  long_press_timeout: !input long_press_timeout
 
 trigger:
   - platform: state
@@ -141,8 +197,53 @@ action:
   - variables:
       press_type: "{{ trigger.to_state.attributes.event_type }}"
       trigger_id: "{{ trigger.id }}"
-      long_press_timeout: !input long_press_timeout
-      duration_helper: !input duration_helper
+
+  - variables:
+      open_switches: >
+        {% if target_area %}
+          {{ area_entities(target_area) | select('match', '^switch\\.') | select('in', label_entities(switch_open_label)) }}
+        {% else %}
+          {{ label_entities(switch_open_label) | select('match', '^switch\\.') }}
+        {% endif %}
+
+  - variables:
+      close_switches: >
+        {% if target_area %}
+          {{ area_entities(target_area) | select('match', '^switch\\.') | select('in', label_entities(switch_close_label)) }}
+        {% else %}
+          {{ label_entities(switch_close_label) | select('match', '^switch\\.') }}
+        {% endif %}
+
+  - variables:
+      all_switches: "{{ open_switches + close_switches }}"
+
+  - variables:
+      duration_helper: >
+        {% if duration_label %}
+          {% set all_helpers = label_entities(duration_label) | select('match', '^input_number\\.') | list %}
+          {% set area_helper = namespace(entity=none) %}
+          {% set global_helper = namespace(entity=none) %}
+          {% for h in all_helpers %}
+            {% if target_area and h | area_name == target_area %}
+              {% set area_helper.entity = h %}
+            {% elif h | area_name == none or h | area_name == '' %}
+              {% set global_helper.entity = h %}
+            {% endif %}
+          {% endfor %}
+          {% if area_helper.entity %}
+            {{ area_helper.entity }}
+          {% elif global_helper.entity %}
+            {{ global_helper.entity }}
+          {% endif %}
+        {% endif %}
+
+  - variables:
+      duration_value: >
+        {% if duration_helper and duration_helper != '' and states(duration_helper, 'unavailable') != 'unavailable' %}
+          {{ states(duration_helper) | float(global_duration) }}
+        {% else %}
+          {{ global_duration }}
+        {% endif %}
 
   - choose:
       # -------------------------------------------------------------
@@ -155,27 +256,24 @@ action:
         sequence:
           - choose:
               - conditions:
-                  - condition: or
-                    conditions:
-                      - condition: state
-                        entity_id: !input sonoff_switch_1
-                        state: "on"
-                      - condition: state
-                        entity_id: !input sonoff_switch_2
-                        state: "on"
+                  - condition: template
+                    value_template: >
+                      {{ 'on' in all_switches | map('state') | list }}
                 sequence:
                   - action: switch.turn_off
                     target:
-                      entity_id:
-                        - !input sonoff_switch_1
-                        - !input sonoff_switch_2
-            default:
-              - action: input_number.increment
-                target:
-                  entity_id: !input duration_helper
+                      entity_id: "{{ all_switches }}"
+              - conditions:
+                  - condition: template
+                    value_template: >
+                      {{ duration_helper and duration_helper != '' and states(duration_helper, 'unavailable') != 'unavailable' }}
+                sequence:
+                  - action: input_number.increment
+                    target:
+                      entity_id: "{{ duration_helper }}"
 
       # -------------------------------------------------------------
-      # BUTTON 1 – Double Press: switch 1 ON for helper value then OFF
+      # BUTTON 1 – Double Press: OPEN ON for duration then OFF
       # -------------------------------------------------------------
       - conditions:
           - condition: template
@@ -184,18 +282,18 @@ action:
         sequence:
           - action: switch.turn_off
             target:
-              entity_id: !input sonoff_switch_2
+              entity_id: "{{ all_switches }}"
           - action: switch.turn_on
             target:
-              entity_id: !input sonoff_switch_1
+              entity_id: "{{ open_switches }}"
           - delay:
-              seconds: "{{ states(duration_helper) | int(30) }}"
+              seconds: "{{ duration_value }}"
           - action: switch.turn_off
             target:
-              entity_id: !input sonoff_switch_1
+              entity_id: "{{ open_switches }}"
 
       # -------------------------------------------------------------
-      # BUTTON 1 – Long Press (on press): switch 1 ON; safety timeout OFF
+      # BUTTON 1 – Long Press (on press): OPEN ON; safety timeout OFF
       # -------------------------------------------------------------
       - conditions:
           - condition: template
@@ -204,18 +302,18 @@ action:
         sequence:
           - action: switch.turn_off
             target:
-              entity_id: !input sonoff_switch_2
+              entity_id: "{{ all_switches }}"
           - action: switch.turn_on
             target:
-              entity_id: !input sonoff_switch_1
+              entity_id: "{{ open_switches }}"
           - delay:
               seconds: "{{ long_press_timeout }}"
           - action: switch.turn_off
             target:
-              entity_id: !input sonoff_switch_1
+              entity_id: "{{ open_switches }}"
 
       # -------------------------------------------------------------
-      # BUTTON 1 – Long Release (on release): switch 1 OFF
+      # BUTTON 1 – Long Release (on release): OPEN OFF
       # -------------------------------------------------------------
       - conditions:
           - condition: template
@@ -224,7 +322,7 @@ action:
         sequence:
           - action: switch.turn_off
             target:
-              entity_id: !input sonoff_switch_1
+              entity_id: "{{ open_switches }}"
 
       # -------------------------------------------------------------
       # BUTTON 2 – Single Press: stop if running, else decrement duration
@@ -236,27 +334,24 @@ action:
         sequence:
           - choose:
               - conditions:
-                  - condition: or
-                    conditions:
-                      - condition: state
-                        entity_id: !input sonoff_switch_1
-                        state: "on"
-                      - condition: state
-                        entity_id: !input sonoff_switch_2
-                        state: "on"
+                  - condition: template
+                    value_template: >
+                      {{ 'on' in all_switches | map('state') | list }}
                 sequence:
                   - action: switch.turn_off
                     target:
-                      entity_id:
-                        - !input sonoff_switch_1
-                        - !input sonoff_switch_2
-            default:
-              - action: input_number.decrement
-                target:
-                  entity_id: !input duration_helper
+                      entity_id: "{{ all_switches }}"
+              - conditions:
+                  - condition: template
+                    value_template: >
+                      {{ duration_helper and duration_helper != '' and states(duration_helper, 'unavailable') != 'unavailable' }}
+                sequence:
+                  - action: input_number.decrement
+                    target:
+                      entity_id: "{{ duration_helper }}"
 
       # -------------------------------------------------------------
-      # BUTTON 2 – Double Press: switch 2 ON for helper value then OFF
+      # BUTTON 2 – Double Press: CLOSE ON for duration then OFF
       # -------------------------------------------------------------
       - conditions:
           - condition: template
@@ -265,18 +360,18 @@ action:
         sequence:
           - action: switch.turn_off
             target:
-              entity_id: !input sonoff_switch_1
+              entity_id: "{{ all_switches }}"
           - action: switch.turn_on
             target:
-              entity_id: !input sonoff_switch_2
+              entity_id: "{{ close_switches }}"
           - delay:
-              seconds: "{{ states(duration_helper) | int(30) }}"
+              seconds: "{{ duration_value }}"
           - action: switch.turn_off
             target:
-              entity_id: !input sonoff_switch_2
+              entity_id: "{{ close_switches }}"
 
       # -------------------------------------------------------------
-      # BUTTON 2 – Long Press (on press): switch 2 ON; safety timeout OFF
+      # BUTTON 2 – Long Press (on press): CLOSE ON; safety timeout OFF
       # -------------------------------------------------------------
       - conditions:
           - condition: template
@@ -285,18 +380,18 @@ action:
         sequence:
           - action: switch.turn_off
             target:
-              entity_id: !input sonoff_switch_1
+              entity_id: "{{ all_switches }}"
           - action: switch.turn_on
             target:
-              entity_id: !input sonoff_switch_2
+              entity_id: "{{ close_switches }}"
           - delay:
               seconds: "{{ long_press_timeout }}"
           - action: switch.turn_off
             target:
-              entity_id: !input sonoff_switch_2
+              entity_id: "{{ close_switches }}"
 
       # -------------------------------------------------------------
-      # BUTTON 2 – Long Release (on release): switch 2 OFF
+      # BUTTON 2 – Long Release (on release): CLOSE OFF
       # -------------------------------------------------------------
       - conditions:
           - condition: template
@@ -305,6 +400,6 @@ action:
         sequence:
           - action: switch.turn_off
             target:
-              entity_id: !input sonoff_switch_2
+              entity_id: "{{ close_switches }}"
 
 mode: restart
