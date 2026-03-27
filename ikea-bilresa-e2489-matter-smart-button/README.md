@@ -33,11 +33,21 @@ To use this blueprint, follow these steps:
 
 ### Inputs
 
-The following inputs are required for this blueprint:
+| Input | Description |
+|-------|-------------|
+| BILRESA Button Device | The IKEA BILRESA E2489 Matter device |
+| Button 1 – Event Entity | Event entity for Button 1 (e.g. `event.bilresa_dual_button_button_1_2`) |
+| Button 2 – Event Entity | Event entity for Button 2 (e.g. `event.bilresa_dual_button_button_2_2`) |
+| Button 1 – Single Press | Action on single press (`multi_press_1`) |
+| Button 1 – Double Press | Action on double press (`multi_press_2`) |
+| Button 1 – Long Press (on press) | Action when long press is registered (`long_press`) |
+| Button 1 – Long Press (on release) | Action when long press is released (`long_release`) |
+| Button 2 – Single Press | Action on single press (`multi_press_1`) |
+| Button 2 – Double Press | Action on double press (`multi_press_2`) |
+| Button 2 – Long Press (on press) | Action when long press is registered (`long_press`) |
+| Button 2 – Long Press (on release) | Action when long press is released (`long_release`) |
 
-- **Button Type**: Select the type of button press (single, double, long press, etc.).
-- **Action**: Select the action to perform when the button is pressed (turn on, turn off, change brightness, etc.).
-- **Entity**: Select the entity to control (e.g., switch, light, camera toggle).
+All action inputs are optional and default to no action.
 
 ## Requirements
 
@@ -86,9 +96,9 @@ blueprint:
   author: censay
   description: >
     Full-featured automation for the IKEA BILRESA E2489 Matter dual-button
-    remote. Supports single press, double press, and long press (on release)
-    for both buttons. Uses event entities exposed by Home Assistant for
-    Matter devices. Single-press actions are prioritized for reliability.
+    remote. Supports single press, double press, long press (on press), and
+    long press (on release) for both buttons. Uses event entities exposed by
+    Home Assistant for Matter devices.
   domain: automation
   source_url: https://github.com/censay/haos-blueprints
   homeassistant:
@@ -140,7 +150,14 @@ blueprint:
       selector:
         action: {}
 
-    button1_long:
+    button1_long_press:
+      name: Button 1 – Long Press (on press)
+      description: Action for Button 1 long press completion (long_press).
+      default: []
+      selector:
+        action: {}
+
+    button1_long_release:
       name: Button 1 – Long Press (on release)
       description: Action for Button 1 long press completion (long_release).
       default: []
@@ -165,7 +182,14 @@ blueprint:
       selector:
         action: {}
 
-    button2_long:
+    button2_long_press:
+      name: Button 2 – Long Press (on press)
+      description: Action for Button 2 long press completion (long_press).
+      default: []
+      selector:
+        action: {}
+
+    button2_long_release:
       name: Button 2 – Long Press (on release)
       description: Action for Button 2 long press completion (long_release).
       default: []
@@ -221,8 +245,14 @@ action:
       - conditions:
           - condition: template
             value_template: >
+              {{ trigger_id == 'button1' and press_type == 'long_press' }}
+        sequence: !input button1_long_press
+
+      - conditions:
+          - condition: template
+            value_template: >
               {{ trigger_id == 'button1' and press_type == 'long_release' }}
-        sequence: !input button1_long
+        sequence: !input button1_long_release
 
       # -------------------------------------------------------------
       # BUTTON 2
@@ -243,8 +273,14 @@ action:
       - conditions:
           - condition: template
             value_template: >
+              {{ trigger_id == 'button2' and press_type == 'long_press' }}
+        sequence: !input button2_long_press
+
+      - conditions:
+          - condition: template
+            value_template: >
               {{ trigger_id == 'button2' and press_type == 'long_release' }}
-        sequence: !input button2_long
+        sequence: !input button2_long_release
 
 mode: restart
 ```
